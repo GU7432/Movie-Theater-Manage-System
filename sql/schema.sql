@@ -20,7 +20,8 @@ SET time_zone = "+00:00";
 --
 -- 資料庫： `final_project`
 --
-
+CREATE DATABASE IF NOT EXISTS `final_project` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `final_project`;
 -- --------------------------------------------------------
 
 --
