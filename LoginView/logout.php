@@ -13,6 +13,6 @@ if (isset($_COOKIE[session_name()])) {
 session_destroy();
 
 // 重定向到登入頁面
-header('Location: login.php?logout=1');
+header('Location: ../index.php');
 exit();
 ?>

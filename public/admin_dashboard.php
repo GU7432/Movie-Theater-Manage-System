@@ -188,12 +188,12 @@ $stats = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理者儀表板</title>
+    <title>管理者儀表板 - 電影院管理系統</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         .sidebar {
-            min-height: 100vh;
+            min-height: calc(100vh - 56px);
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
         .stat-card {
@@ -207,24 +207,9 @@ $stats = [
         }
     </style>
 </head>
-<body>
+<body class="bg-light">
 
-<!-- 導覽列 -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">🎬 電影院管理系統</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <span class="nav-link">歡迎, <?= htmlspecialchars($_SESSION['username'] ?? 'Admin') ?></span>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="../LoginView/logout.php">登出</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<?php $isAdmin = true; include '../LoginView/navbar.php'; ?>
 
 <div class="container-fluid">
     <div class="row">

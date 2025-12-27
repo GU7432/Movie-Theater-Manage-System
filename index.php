@@ -2,6 +2,11 @@
 session_start();
 require_once "config/db_conn.php";
 
+// 获取 flash 消息
+$flash_error = $_SESSION['flash_error'] ?? '';
+$flash_success = $_SESSION['flash_success'] ?? '';
+unset($_SESSION['flash_error'], $_SESSION['flash_success']);
+
 // 查詢所有電影
 $sql = "SELECT * FROM movie ORDER BY MovieID ASC";
 $stmt = $db->prepare($sql);
@@ -14,28 +19,19 @@ $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta charset="UTF-8">
-    <title>電影列表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電影列表 - 電影院管理系統</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 </head>
 
-<body class="p-4">
+<body class="bg-light">
+
+    <?php $isAdmin = false; include 'LoginView/navbar.php'; ?>
 
     <div class="container">
-
-        <!-- 導航按鈕 -->
-        <div class="mb-4 d-flex justify-content-between">
-            <a href="index.php" class="btn btn-secondary">Home</a>
-            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-                <div>
-                    <span class="me-3">歡迎，<?= htmlspecialchars($_SESSION['username']) ?></span>
-                    <a href="LoginView/logout.php" class="btn btn-warning">登出</a>
-                </div>
-            <?php else: ?>
-                <a href="LoginView/login.php" class="btn btn-warning">登入</a>
-            <?php endif; ?>
-        </div>
 
         <h2 class="mb-4">現正上映電影</h2>
 
@@ -79,6 +75,11 @@ $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
 
     </div>
+
+    <?php include 'LoginView/login_modal.php'; ?>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

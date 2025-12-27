@@ -4,7 +4,7 @@ require_once '../config/db_conn.php';
 
 // 檢查是否為 POST 請求
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: login.php');
+    header('Location: ../index.php');
     exit();
 }
 
@@ -14,7 +14,8 @@ $password = $_POST['password'] ?? '';
 
 // 檢查是否有空值
 if (empty($username) || empty($password)) {
-    header('Location: login.php?error=empty');
+    $_SESSION['flash_error'] = '使用者名稱和密碼不能為空';
+    header('Location: ../index.php');
     exit();
 }
 
@@ -47,13 +48,15 @@ try {
         exit();
     } else {
         // 登入失敗
-        header('Location: login.php?error=invalid');
+        $_SESSION['flash_error'] = '使用者名稱或密碼錯誤';
+        header('Location: ../index.php');
         exit();
     }
     
 } catch (PDOException $e) {
     error_log("登入錯誤: " . $e->getMessage());
-    header('Location: login.php?error=system');
+    $_SESSION['flash_error'] = '系統錯誤，請稍後再試';
+    header('Location: ../index.php');
     exit();
 }
 ?>
