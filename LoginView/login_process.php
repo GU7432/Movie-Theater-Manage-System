@@ -4,7 +4,7 @@ require_once '../config/db_conn.php';
 
 // 檢查是否為 POST 請求
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: login.html');
+    header('Location: login.php');
     exit();
 }
 
@@ -14,7 +14,7 @@ $password = $_POST['password'] ?? '';
 
 // 檢查是否有空值
 if (empty($username) || empty($password)) {
-    header('Location: login.html?error=empty');
+    header('Location: login.php?error=empty');
     exit();
 }
 
@@ -47,13 +47,13 @@ try {
         exit();
     } else {
         // 登入失敗
-        header('Location: login.html?error=invalid');
+        header('Location: login.php?error=invalid');
         exit();
     }
     
 } catch (PDOException $e) {
     error_log("登入錯誤: " . $e->getMessage());
-    header('Location: login.html?error=system');
+    header('Location: login.php?error=system');
     exit();
 }
 ?>

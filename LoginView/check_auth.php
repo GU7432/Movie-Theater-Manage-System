@@ -6,7 +6,7 @@ session_start();
 
 // 檢查是否已登入
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header('Location: ../LoginView/login.html');
+    header('Location: ../LoginView/login.php');
     exit();
 }
 
@@ -17,7 +17,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
     // Session 過期
     session_unset();
     session_destroy();
-    header('Location: ../LoginView/login.html?error=timeout');
+    header('Location: ../LoginView/login.php?error=timeout');
     exit();
 }
 
