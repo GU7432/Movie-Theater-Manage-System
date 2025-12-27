@@ -38,7 +38,7 @@
         <?= htmlspecialchars($movie['Title'])?> - 場次列表
     </h2>
 
-    <a href="movie_list.php" class="btn btn-secondary mb-3">← 返回電影列表</a>
+    <a href="index.php" class="btn btn-secondary mb-3">← 返回電影列表</a>
 
     <table class="table table-striped">
         <thead>
