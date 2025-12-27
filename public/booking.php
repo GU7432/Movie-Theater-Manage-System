@@ -40,11 +40,6 @@
     <form action="booking_save.php" method="POST" class="card p-3">
 
         <div class="mb-3">
-            <label>顧客姓名</label>
-            <input type="text" name="customer" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
             <label>座位號碼</label>
             <input type="text" name="seat" class="form-control" required>
         </div>
