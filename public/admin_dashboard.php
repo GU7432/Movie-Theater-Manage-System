@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once "../config/db_conn.php";
 require_once "../LoginView/check_admin.php";
 
