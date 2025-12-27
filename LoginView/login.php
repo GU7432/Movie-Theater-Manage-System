@@ -64,7 +64,7 @@ unset($_SESSION['flash_error'], $_SESSION['flash_success'], $_SESSION['flash_inf
             </form>
 
             <div class="register-link">
-                <p>還沒有帳號？ <a href="register.html">立即註冊</a></p>
+                <p>還沒有帳號？ <a href="register.php">立即註冊</a></p>
             </div>
         </div>
     </div>

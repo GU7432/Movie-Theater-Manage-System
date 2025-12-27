@@ -3,7 +3,7 @@ require_once '../config/db_conn.php';
 
 // 檢查是否為 POST 請求
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: register.html');
+    header('Location: register.php');
     exit();
 }
 
@@ -14,19 +14,19 @@ $confirm_password = $_POST['confirm_password'] ?? '';
 
 // 檢查是否有空值
 if (empty($username) || empty($password) || empty($confirm_password)) {
-    header('Location: register.html?error=empty');
+    header('Location: register.php?error=empty');
     exit();
 }
 
 // 檢查密碼是否一致
 if ($password !== $confirm_password) {
-    header('Location: register.html?error=password_mismatch');
+    header('Location: register.php?error=password_mismatch');
     exit();
 }
 
 // 檢查密碼長度
 if (strlen($password) < 6) {
-    header('Location: register.html?error=password_short');
+    header('Location: register.php?error=password_short');
     exit();
 }
 
@@ -37,7 +37,7 @@ try {
     $checkStmt->execute();
     
     if ($checkStmt->fetch()) {
-        header('Location: register.html?error=username_exists');
+        header('Location: register.php?error=username_exists');
         exit();
     }
     
@@ -55,13 +55,13 @@ try {
         exit();
     } else {
         // 註冊失敗
-        header('Location: register.html?error=registration_failed');
+        header('Location: register.php?error=registration_failed');
         exit();
     }
     
 } catch (PDOException $e) {
     error_log("註冊錯誤: " . $e->getMessage());
-    header('Location: register.html?error=system');
+    header('Location: register.php?error=system');
     exit();
 }
 ?>
