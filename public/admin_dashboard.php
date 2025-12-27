@@ -101,6 +101,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo json_encode(['success' => true, 'data' => $screening]);
                 break;
                 
+            case 'get_seats':
+                $id = intval($_POST['screening_id']);
+                // 取得場次資訊
+                $stmt = $db->prepare("SELECT s.*, m.Title as MovieTitle FROM screening s JOIN movie m ON s.MovieID=m.MovieID WHERE s.ScreeningID=?");
+                $stmt->execute([$id]);
+                $screening = $stmt->fetch(PDO::FETCH_ASSOC);
+                // 取得已訂座位
+                $stmt = $db->prepare("SELECT SeatNumber, UserName, PurchaseTime FROM ticket WHERE ScreeningID=? ORDER BY SeatNumber");
+                $stmt->execute([$id]);
+                $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                echo json_encode(['success' => true, 'screening' => $screening, 'tickets' => $tickets]);
+                break;
+                
             default:
                 echo json_encode(['success' => false, 'message' => '未知操作']);
         }
@@ -327,6 +340,9 @@ $stats = [
                                             </span>
                                         </td>
                                         <td class="table-actions">
+                                            <button class="btn btn-sm btn-info" onclick="viewSeats(<?= $s['ScreeningID'] ?>)">
+                                                <i class="bi bi-grid-3x3"></i> 座位
+                                            </button>
                                             <button class="btn btn-sm btn-warning" onclick="editScreening(<?= $s['ScreeningID'] ?>)">
                                                 <i class="bi bi-pencil"></i> 編輯
                                             </button>
@@ -435,6 +451,61 @@ $stats = [
         </div>
     </div>
 </div>
+
+<!-- 座位查看 Modal -->
+<div class="modal fade" id="seatsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="seatsModalTitle">座位狀態</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <span class="badge bg-success me-2">空位</span>
+                    <span class="badge bg-danger me-2">已訂</span>
+                </div>
+                <div id="seatsGrid" class="mb-4"></div>
+                <h6>訂票明細</h6>
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>座位</th>
+                            <th>訂票人</th>
+                            <th>訂票時間</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsList"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.seat-box {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: default;
+}
+.seat-box.available {
+    background: #198754;
+    color: white;
+}
+.seat-box.taken {
+    background: #dc3545;
+    color: white;
+}
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -556,6 +627,58 @@ document.getElementById('screeningForm').addEventListener('submit', function(e) 
         if (data.success) location.reload();
     });
 });
+
+// ========== 座位查看 ==========
+function viewSeats(id) {
+    fetch('admin_dashboard.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `action=get_seats&screening_id=${id}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const s = data.screening;
+            const tickets = data.tickets;
+            const takenSeats = tickets.map(t => t.SeatNumber);
+            
+            // 更新標題
+            document.getElementById('seatsModalTitle').textContent = 
+                `座位狀態 - ${s.MovieTitle} (${s.StartTime} ${s.Hall})`;
+            
+            // 產生座位圖
+            const rows = ['A','B','C','D','E','F','G','H','I','J'];
+            const cols = [1,2,3,4,5,6,7,8,9,10];
+            let html = '';
+            rows.forEach(r => {
+                cols.forEach(c => {
+                    const seat = r + String(c).padStart(2, '0');
+                    const isTaken = takenSeats.includes(seat);
+                    html += `<div class="seat-box ${isTaken ? 'taken' : 'available'}" title="${seat}">${seat}</div>`;
+                });
+                html += '<br>';
+            });
+            document.getElementById('seatsGrid').innerHTML = html;
+            
+            // 產生訂票明細
+            let ticketsHtml = '';
+            if (tickets.length === 0) {
+                ticketsHtml = '<tr><td colspan="3" class="text-center text-muted">尚無訂票</td></tr>';
+            } else {
+                tickets.forEach(t => {
+                    ticketsHtml += `<tr>
+                        <td><span class="badge bg-secondary">${t.SeatNumber}</span></td>
+                        <td>${t.UserName}</td>
+                        <td>${t.PurchaseTime}</td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('ticketsList').innerHTML = ticketsHtml;
+            
+            new bootstrap.Modal(document.getElementById('seatsModal')).show();
+        }
+    });
+}
 </script>
 </body>
 </html>
