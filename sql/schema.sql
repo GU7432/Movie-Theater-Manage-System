@@ -154,3 +154,39 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_ticket_before_insert
+BEFORE INSERT ON ticket
+FOR EACH ROW
+BEGIN
+    DECLARE seats INT;
+
+    SELECT AvailableSeats
+    INTO seats
+    FROM screening
+    WHERE ScreeningID = NEW.ScreeningID
+    FOR UPDATE;
+
+    IF seats <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = '本場次座位已滿';
+    END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_ticket_after_insert
+AFTER INSERT ON ticket
+FOR EACH ROW
+BEGIN
+    UPDATE screening
+    SET AvailableSeats = AvailableSeats - 1
+    WHERE ScreeningID = NEW.ScreeningID;
+END$$
+
+DELIMITER ;
+
