@@ -1,8 +1,15 @@
 <?php
+session_start();
 require_once "../config/db_conn.php";
 
+// 檢查是否為 POST 請求
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: login.html');
+    exit();
+}
+
 $screening_id = intval($_POST['screening_id']);
-$customer = trim($_POST['customer']);
+$customer = $_SESSION['username'];
 $seat = trim($_POST['seat']);
 
 if(!$customer || !$seat){

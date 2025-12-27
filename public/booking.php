@@ -105,10 +105,6 @@ foreach ($rows as $r){
 <!-- 訂票表單 -->
 <form action="booking_save.php" method="POST">
     <div class="mb-3">
-        <label>顧客姓名</label>
-        <input type="text" name="customer" class="form-control" required>
-    </div>
-    <div class="mb-3">
         <label>座位號碼</label>
         <input type="text" id="seatInput" name="seat" class="form-control" required readonly>
     </div>
