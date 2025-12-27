@@ -133,12 +133,14 @@ ALTER TABLE `users`
 ALTER TABLE `ticket`
   MODIFY `TicketID` int(15) NOT NULL AUTO_INCREMENT COMMENT '訂單編號';
 
+ALTER TABLE `movie`
+  MODIFY `MovieID` int(15) NOT NULL AUTO_INCREMENT COMMENT '電影編號';
+
+ALTER TABLE `screening`
+  MODIFY `ScreeningID` int(15) NOT NULL AUTO_INCREMENT COMMENT '場次編號';
 --
 -- 已傾印資料表的限制式
 --
-
---
--- 資料表的限制式 `screening`
 --
 ALTER TABLE `screening`
   ADD CONSTRAINT `screening_ibfk_1` FOREIGN KEY (`MovieID`) REFERENCES `movie` (`MovieID`) ON DELETE CASCADE ON UPDATE CASCADE;
