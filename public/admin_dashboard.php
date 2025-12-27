@@ -14,11 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $title = trim($_POST['title']);
                 $genre = trim($_POST['genre']);
                 $duration = intval($_POST['duration']);
-                $rating = trim($_POST['rating']);
-                $description = trim($_POST['description']);
                 
-                $stmt = $db->prepare("INSERT INTO movie (Title, Genre, Duration, Rating, Description) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$title, $genre, $duration, $rating, $description]);
+                $stmt = $db->prepare("INSERT INTO movie (Title, Genre, Duration) VALUES (?, ?, ?)");
+                $stmt->execute([$title, $genre, $duration]);
                 echo json_encode(['success' => true, 'message' => '電影新增成功']);
                 break;
                 
@@ -27,11 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $title = trim($_POST['title']);
                 $genre = trim($_POST['genre']);
                 $duration = intval($_POST['duration']);
-                $rating = trim($_POST['rating']);
-                $description = trim($_POST['description']);
                 
-                $stmt = $db->prepare("UPDATE movie SET Title=?, Genre=?, Duration=?, Rating=?, Description=? WHERE MovieID=?");
-                $stmt->execute([$title, $genre, $duration, $rating, $description, $id]);
+                $stmt = $db->prepare("UPDATE movie SET Title=?, Genre=?, Duration=? WHERE MovieID=?");
+                $stmt->execute([$title, $genre, $duration, $id]);
                 echo json_encode(['success' => true, 'message' => '電影修改成功']);
                 break;
                 
@@ -198,11 +194,6 @@ $stats = [
                         <i class="bi bi-calendar-event"></i> 場次管理
                     </a>
                 </li>
-                <li class="nav-item mt-3">
-                    <a class="nav-link text-secondary" href="../index.php">
-                        <i class="bi bi-house"></i> 回首頁
-                    </a>
-                </li>
             </ul>
         </nav>
 
@@ -273,7 +264,6 @@ $stats = [
                                         <th>電影名稱</th>
                                         <th>類型</th>
                                         <th>片長</th>
-                                        <th>分級</th>
                                         <th>操作</th>
                                     </tr>
                                 </thead>
@@ -284,7 +274,6 @@ $stats = [
                                         <td><?= htmlspecialchars($m['Title']) ?></td>
                                         <td><?= htmlspecialchars($m['Genre'] ?? '-') ?></td>
                                         <td><?= $m['Duration'] ?? '-' ?> 分鐘</td>
-                                        <td><?= htmlspecialchars($m['Rating'] ?? '-') ?></td>
                                         <td class="table-actions">
                                             <button class="btn btn-sm btn-warning" onclick="editMovie(<?= $m['MovieID'] ?>)">
                                                 <i class="bi bi-pencil"></i> 編輯
@@ -383,20 +372,6 @@ $stats = [
                         <label class="form-label">片長 (分鐘)</label>
                         <input type="number" class="form-control" id="movie_duration" name="duration" min="1">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">分級</label>
-                        <select class="form-select" id="movie_rating" name="rating">
-                            <option value="">請選擇</option>
-                            <option value="G">G - 普遍級</option>
-                            <option value="PG">PG - 保護級</option>
-                            <option value="PG-13">PG-13 - 輔導級</option>
-                            <option value="R">R - 限制級</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">簡介</label>
-                        <textarea class="form-control" id="movie_description" name="description" rows="3"></textarea>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -487,8 +462,6 @@ function editMovie(id) {
             document.getElementById('movie_title').value = m.Title;
             document.getElementById('movie_genre').value = m.Genre || '';
             document.getElementById('movie_duration').value = m.Duration || '';
-            document.getElementById('movie_rating').value = m.Rating || '';
-            document.getElementById('movie_description').value = m.Description || '';
             new bootstrap.Modal(document.getElementById('movieModal')).show();
         }
     });
