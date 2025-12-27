@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $hall = trim($_POST['hall']);
                 $start_time = $_POST['start_time'];
                 $price = floatval($_POST['price']);
-                $seats = intval($_POST['available_seats']);
+                $seats = 100; // 固定座位数为100
                 
                 $stmt = $db->prepare("INSERT INTO screening (MovieID, Hall, StartTime, Price, AvailableSeats) VALUES (?, ?, ?, ?, ?)");
                 $stmt->execute([$movie_id, $hall, $start_time, $price, $seats]);
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $hall = trim($_POST['hall']);
                 $start_time = $_POST['start_time'];
                 $price = floatval($_POST['price']);
-                $seats = intval($_POST['available_seats']);
+                $seats = 100; // 固定座位数为100
                 
                 $stmt = $db->prepare("UPDATE screening SET MovieID=?, Hall=?, StartTime=?, Price=?, AvailableSeats=? WHERE ScreeningID=?");
                 $stmt->execute([$movie_id, $hall, $start_time, $price, $seats, $id]);
@@ -494,9 +494,8 @@ $stats = [
                         <label class="form-label">票價 *</label>
                         <input type="number" class="form-control" id="screening_price" name="price" min="0" step="10" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">可用座位數 *</label>
-                        <input type="number" class="form-control" id="screening_seats" name="available_seats" min="0" value="100" required>
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> 每個影廳固定座位數：100
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -653,7 +652,6 @@ function openAddScreeningModal() {
     document.getElementById('screening_action').value = 'add_screening';
     document.getElementById('screeningForm').reset();
     document.getElementById('screening_id').value = '';
-    document.getElementById('screening_seats').value = 100;
 }
 
 function editScreening(id) {
@@ -673,7 +671,6 @@ function editScreening(id) {
             document.getElementById('screening_hall').value = s.Hall;
             document.getElementById('screening_start_time').value = s.StartTime.replace(' ', 'T');
             document.getElementById('screening_price').value = s.Price;
-            document.getElementById('screening_seats').value = s.AvailableSeats;
             new bootstrap.Modal(document.getElementById('screeningModal')).show();
         }
     });
