@@ -34,13 +34,6 @@ CREATE TABLE `users` (
   `IsAdmin` boolean NOT NULL COMMENT `是否為admin`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- 傾印資料表的資料 `users`
---
-
-INSERT INTO `movie` (`MovieID`, `Title`, `Genre`, `Duration`) VALUES
-(0, '希希的下北澤之旅', '愛情', 135),
-(10, '成都超人', '動畫', 120);
 
 -- --------------------------------------------------------
 
@@ -112,6 +105,12 @@ INSERT INTO `ticket` (`TicketID`, `ScreeningID`, `CustomerName`, `SeatNumber`, `
 --
 -- 已傾印資料表的索引
 --
+
+--
+-- 資料表索引 `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`UserName`);
 
 --
 -- 資料表索引 `movie`

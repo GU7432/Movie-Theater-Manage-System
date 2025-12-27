@@ -1,3 +1,22 @@
+<?php
+    if(!isset($_GET['screening_id'])) {
+        die("screening_id not provided.");
+    }
+
+    $screening_id = intval($_GET['screening_id']);
+
+    require_once "../config/db_conn.php";
+
+    $sql_screening = "select * from screening where ScreeningID = ?";
+    $stmt = $db->prepare($sql_screening);
+    $stmt->execute([$screening_id]);
+    $screening = $stmt->fetch();
+
+    if (!$screening) {
+        die("找不到該場次");
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -10,8 +29,6 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- 自己的 CSS（可選） -->
-    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 
 <body class="p-4">
@@ -32,7 +49,9 @@
             <input type="text" name="seat" class="form-control" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">送出訂票</button>
+        <input type="hidden" name="screening_id" value="<?= $screening['ScreeningID'] ?>">
+
+        <button type="submit" class="btn btn-primary">提交訂票</button>
     </form>
 
 </div>
