@@ -39,6 +39,8 @@ $stmt->execute([$screening_id, $customer, $seat]);
 $stmt = $db->prepare("UPDATE screening SET AvailableSeats=AvailableSeats-1 WHERE ScreeningID=?");
 $stmt->execute([$screening_id]);
 
-echo "訂票成功！<br>";
-echo "<a href='booking.php?movie_id=".$screening_id."'>回訂票頁面</a>";
+// 訂票成功，跳轉到首頁
+$_SESSION['flash_success'] = '訂票成功！座位：' . htmlspecialchars($seat);
+header('Location: ../index.php');
+exit();
 ?>

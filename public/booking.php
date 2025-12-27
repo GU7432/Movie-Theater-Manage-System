@@ -2,22 +2,42 @@
 session_start();
 require_once "../config/db_conn.php";
 
+// 获取 flash 消息
+$flash_error = $_SESSION['flash_error'] ?? '';
+$flash_success = $_SESSION['flash_success'] ?? '';
+unset($_SESSION['flash_error'], $_SESSION['flash_success']);
+
 // 取得所有電影
 $movies = $db->query("SELECT * FROM movie")->fetchAll(PDO::FETCH_ASSOC);
 
-// 選擇電影
-$selected_movie_id = isset($_GET['movie_id']) ? intval($_GET['movie_id']) : ($movies[0]['MovieID'] ?? 0);
+// 檢查是否從 screening_list 直接進入（有 screening_id 參數）
+$from_screening_list = isset($_GET['screening_id']);
+
+// 選擇場次
+$selected_screening_id = isset($_GET['screening_id']) ? intval($_GET['screening_id']) : 0;
+
+if ($selected_screening_id) {
+    // 如果有 screening_id，從場次取得電影ID
+    $stmt = $db->prepare("SELECT MovieID FROM screening WHERE ScreeningID=?");
+    $stmt->execute([$selected_screening_id]);
+    $selected_movie_id = $stmt->fetchColumn() ?: 0;
+} else {
+    // 否則從 movie_id 或第一部電影開始
+    $selected_movie_id = isset($_GET['movie_id']) ? intval($_GET['movie_id']) : ($movies[0]['MovieID'] ?? 0);
+}
 
 // 取得電影場次
 $stmt = $db->prepare("SELECT * FROM screening WHERE MovieID=? ORDER BY StartTime ASC");
 $stmt->execute([$selected_movie_id]);
 $screenings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// 選擇場次
-$selected_screening_id = isset($_GET['screening_id']) ? intval($_GET['screening_id']) : ($screenings[0]['ScreeningID'] ?? 0);
+// 如果沒有指定場次，選第一個
+if (!$selected_screening_id && !empty($screenings)) {
+    $selected_screening_id = $screenings[0]['ScreeningID'];
+}
 
 // 取得選中場次資訊
-$stmt = $db->prepare("SELECT * FROM screening WHERE ScreeningID=?");
+$stmt = $db->prepare("SELECT s.*, m.Title as MovieTitle FROM screening s JOIN movie m ON s.MovieID = m.MovieID WHERE s.ScreeningID=?");
 $stmt->execute([$selected_screening_id]);
 $screening = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -90,44 +110,72 @@ $taken_seats = $stmt->fetchAll(PDO::FETCH_COLUMN);
         <i class="bi bi-ticket-perforated"></i> 訂票頁面
     </h2>
 
-<!-- 選電影 -->
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-film"></i> 選擇電影</h5>
-                <form method="GET">
-                    <select name="movie_id" class="form-select" onchange="this.form.submit()">
-                        <?php foreach ($movies as $movie): ?>
-                            <option value="<?= $movie['MovieID'] ?>" <?= $movie['MovieID']==$selected_movie_id?'selected':'' ?>>
-                                <?= htmlspecialchars($movie['Title']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </form>
+<?php if ($from_screening_list && $screening): ?>
+    <!-- 從場次列表進入，顯示當前場次資訊 -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="mb-3"><i class="bi bi-film"></i> 電影資訊</h5>
+                    <p class="mb-1"><strong>電影名稱：</strong><?= htmlspecialchars($screening['MovieTitle']) ?></p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="mb-3"><i class="bi bi-calendar-event"></i> 場次資訊</h5>
+                    <p class="mb-1"><strong>時間：</strong><?= $screening['StartTime'] ?></p>
+                    <p class="mb-1"><strong>廳別：</strong><?= htmlspecialchars($screening['Hall']) ?></p>
+                    <p class="mb-1"><strong>票價：</strong>$<?= $screening['Price'] ?></p>
+                    <p class="mb-0"><strong>剩餘座位：</strong><span class="badge bg-success"><?= $screening['AvailableSeats'] ?></span></p>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-calendar-event"></i> 選擇場次</h5>
-                <form method="GET">
-                    <input type="hidden" name="movie_id" value="<?= $selected_movie_id ?>">
-                    <select name="screening_id" class="form-select" onchange="this.form.submit()">
-                        <?php foreach ($screenings as $s): ?>
-                            <option value="<?= $s['ScreeningID'] ?>" <?= $s['ScreeningID']==$selected_screening_id?'selected':'' ?>>
-                                <?= $s['StartTime'] ?> - <?= $s['Hall'] ?> - $<?= $s['Price'] ?> (剩餘 <?= $s['AvailableSeats'] ?>)
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </form>
+<?php else: ?>
+    <!-- 一般進入，顯示選擇表單 -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-film"></i> 選擇電影</h5>
+                    <form method="GET">
+                        <select name="movie_id" class="form-select" onchange="this.form.submit()">
+                            <?php foreach ($movies as $movie): ?>
+                                <option value="<?= $movie['MovieID'] ?>" <?= $movie['MovieID']==$selected_movie_id?'selected':'' ?>>
+                                    <?= htmlspecialchars($movie['Title']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-calendar-event"></i> 選擇場次</h5>
+                    <?php if (empty($screenings)): ?>
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> 該電影目前沒有場次
+                        </div>
+                    <?php else: ?>
+                    <form method="GET">
+                        <input type="hidden" name="movie_id" value="<?= $selected_movie_id ?>">
+                        <select name="screening_id" class="form-select" onchange="this.form.submit()">
+                            <?php foreach ($screenings as $s): ?>
+                                <option value="<?= $s['ScreeningID'] ?>" <?= $s['ScreeningID']==$selected_screening_id?'selected':'' ?>>
+                                    <?= $s['StartTime'] ?> - <?= $s['Hall'] ?> - $<?= $s['Price'] ?> (剩餘 <?= $s['AvailableSeats'] ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
-</div>
+<?php endif; ?>
 
+<?php if (!empty($screenings) && $screening): ?>
 <!-- 座位選擇 -->
 <div class="card shadow-sm mb-4">
     <div class="card-body">
@@ -152,9 +200,9 @@ $taken_seats = $stmt->fetchAll(PDO::FETCH_COLUMN);
         ?>
         </div>
         <div class="mt-3 d-flex justify-content-center gap-4">
-            <div><span class="seat" style="pointer-events:none;"></span> 可選</div>
-            <div><span class="seat selected" style="pointer-events:none;"></span> 已選</div>
-            <div><span class="seat taken" style="pointer-events:none;"></span> 已售</div>
+            <div><span class="seat seat-legend" style="pointer-events:none;"></span> 可選</div>
+            <div><span class="seat selected seat-legend" style="pointer-events:none;"></span> 已選</div>
+            <div><span class="seat taken seat-legend" style="pointer-events:none;"></span> 已售</div>
         </div>
     </div>
 </div>
@@ -163,25 +211,39 @@ $taken_seats = $stmt->fetchAll(PDO::FETCH_COLUMN);
 <div class="card shadow-sm">
     <div class="card-body">
         <h5 class="card-title"><i class="bi bi-check-circle"></i> 確認訂票</h5>
-        <form action="booking_save.php" method="POST">
-            <div class="mb-3">
-                <label class="form-label"><i class="bi bi-pin-map"></i> 座位號碼</label>
-                <input type="text" id="seatInput" name="seat" class="form-control" required readonly placeholder="請點擊上方座位選擇">
+        <?php if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']): ?>
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> 請先登入才能訂票
             </div>
-            <input type="hidden" name="screening_id" value="<?= $screening['ScreeningID'] ?>">
-            <button type="submit" class="btn btn-primary w-100">
-                <i class="bi bi-cart-check"></i> 確認訂票
+            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#loginModal">
+                <i class="bi bi-box-arrow-in-right"></i> 登入
             </button>
-        </form>
+        <?php else: ?>
+            <form action="booking_save.php" method="POST">
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-pin-map"></i> 座位號碼</label>
+                    <input type="text" id="seatInput" name="seat" class="form-control" required readonly placeholder="請點擊上方座位選擇">
+                </div>
+                <input type="hidden" name="screening_id" value="<?= $screening['ScreeningID'] ?>">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-cart-check"></i> 確認訂票
+                </button>
+            </form>
+        <?php endif; ?>
     </div>
 </div>
+<?php endif; ?>
 
 </div>
+
+<?php include '../LoginView/login_modal.php'; ?>
 
 <script>
 $(document).ready(function(){
+    // 只选择 seats 区域内的座位，排除已被订和标识图
     $("#seats .seat").not(".taken").click(function(){
-        $("#seats .seat").removeClass("selected");   // 只清座位表，不動圖例
+        // 只清除 seats 区域内的 selected 状态
+        $("#seats .seat").removeClass("selected");
         $(this).addClass("selected");
         $("#seatInput").val($(this).data("seat"));
     });

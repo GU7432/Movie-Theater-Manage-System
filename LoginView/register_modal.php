@@ -1,4 +1,10 @@
 <!-- 註冊模態框 -->
+<?php
+// 自動檢測當前頁面所在目錄，設置正確的相對路徑
+$current_dir_reg = basename(dirname($_SERVER['SCRIPT_FILENAME']));
+$in_public_reg = ($current_dir_reg === 'public');
+$path_prefix_reg = $in_public_reg ? '../' : '';
+?>
 <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -13,7 +19,7 @@
                     </div>
                 <?php endif; ?>
 
-                <form action="LoginView/register_process.php" method="POST" id="registerForm">
+                <form action="<?= $path_prefix_reg ?>LoginView/register_process.php" method="POST" id="registerForm">
                     <div class="mb-3">
                         <label for="register_username" class="form-label">使用者名稱</label>
                         <input type="text" class="form-control" id="register_username" name="username" required placeholder="請輸入使用者名稱">

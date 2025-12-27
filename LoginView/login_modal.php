@@ -1,4 +1,10 @@
 <!-- 登入模態框 -->
+<?php
+// 自動檢測當前頁面所在目錄，設置正確的相對路徑
+$current_dir_modal = basename(dirname($_SERVER['SCRIPT_FILENAME']));
+$in_public_modal = ($current_dir_modal === 'public');
+$path_prefix_modal = $in_public_modal ? '../' : '';
+?>
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -19,7 +25,8 @@
                     </div>
                 <?php endif; ?>
 
-                <form action="LoginView/login_process.php" method="POST">
+                <form action="<?= $path_prefix_modal ?>LoginView/login_process.php" method="POST">
+                    <input type="hidden" name="redirect_url" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
                     <div class="mb-3">
                         <label for="username" class="form-label">使用者名稱</label>
                         <input type="text" class="form-control" id="username" name="username" required placeholder="請輸入使用者名稱">

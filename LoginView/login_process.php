@@ -43,7 +43,13 @@ try {
         if ($user['IsAdmin']) {
             header('Location: ../public/admin_dashboard.php');
         } else {
-            header('Location: ../index.php');
+            // 檢查是否有重定向 URL
+            $redirect_url = $_POST['redirect_url'] ?? '../index.php';
+            // 確保重定向 URL 是內部鏈接，防止開放重定向攻擊
+            if (strpos($redirect_url, 'http') === 0 || strpos($redirect_url, '//') === 0) {
+                $redirect_url = '../index.php';
+            }
+            header('Location: ' . $redirect_url);
         }
         exit();
     } else {
