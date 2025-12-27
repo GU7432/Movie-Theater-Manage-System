@@ -11,7 +11,6 @@ if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
 // 1. 檢查必要參數
 if (
     !isset($_POST['screening_id']) ||
-    !isset($_POST['customer']) ||
     !isset($_POST['seat'])
 ) {
     die("資料不完整");
