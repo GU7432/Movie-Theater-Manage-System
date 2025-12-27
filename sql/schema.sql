@@ -75,11 +75,7 @@ CREATE TABLE `ticket` (
   `PurchaseTime` datetime NOT NULL COMMENT '訂購時間',
   PRIMARY KEY (`TicketID`),
   KEY `ScreeningID` (`ScreeningID`),
-  CONSTRAINT `ticket_ibfk_1` FOREIGN KEY (`ScreeningID`) REFERENCES `screening` (`ScreeningID`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `UserName` (`UserName`),
+  CONSTRAINT `ticket_ibfk_1` FOREIGN KEY (`ScreeningID`) REFERENCES `screening` (`ScreeningID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `ticket_ibfk_2` FOREIGN KEY (`UserName`) REFERENCES `users` (`UserName`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- 範例資料
-INSERT INTO `ticket` (`ScreeningID`, `UserName`, `SeatNumber`, `PurchaseTime`) VALUES
-(1, '楊小熹', 'G09', '2025-12-06 11:47:49'),
-(17, '小管管', 'I04', '2025-11-13 18:48:31');
-
