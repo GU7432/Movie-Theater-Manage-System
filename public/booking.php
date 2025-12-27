@@ -51,7 +51,7 @@ $taken_seats = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 <li class="nav-item"><a class="nav-link" href="../index.php">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="booking.php">訂票</a></li>
                 <li class="nav-item"><a class="nav-link" href="mytickets.php">我的票券</a></li>
-                <li class="nav-item"><a class="nav-link" href="../LoginView/login.html">登入</a></li>
+                <li class="nav-item"><a class="nav-link" href="../LoginView/login.php">登入</a></li>
             </ul>
         </div>
     </div>

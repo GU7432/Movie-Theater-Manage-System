@@ -4,7 +4,7 @@ require_once "../config/db_conn.php";
 
 // 檢查是否為 POST 請求
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: login.html');
+    header('Location: login.php');
     exit();
 }
 
