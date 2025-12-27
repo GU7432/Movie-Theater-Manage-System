@@ -76,7 +76,7 @@ INSERT INTO `screening` (`ScreeningID`, `MovieID`, `StartTime`, `Hall`, `Price`,
 CREATE TABLE `ticket` (
   `TicketID` int(15) NOT NULL COMMENT '訂單編號',
   `ScreeningID` int(15) NOT NULL COMMENT '場次編號',
-  `CustomerName` varchar(255) NOT NULL COMMENT '訂單顧客姓名',
+  `UserName` varchar(255) NOT NULL COMMENT '訂單顧客姓名',
   `SeatNumber` varchar(10) NOT NULL COMMENT '坐位號碼',
   `PurchaseTime` datetime NOT NULL COMMENT '訂購時間'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
