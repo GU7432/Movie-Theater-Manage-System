@@ -25,6 +25,26 @@ USE `final_project`;
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `users`
+--
+
+CREATE TABLE `users` (
+  `UserName` varchar(255) NOT NULL COMMENT '使用者名稱',
+  `password_hash` VARCHAR(255) NOT NULL COMMENT `密碼hash`,
+  `IsAdmin` boolean NOT NULL COMMENT `是否為admin`
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- 傾印資料表的資料 `users`
+--
+
+INSERT INTO `movie` (`MovieID`, `Title`, `Genre`, `Duration`) VALUES
+(0, '希希的下北澤之旅', '愛情', 135),
+(10, '成都超人', '動畫', 120);
+
+-- --------------------------------------------------------
+
+--
 -- 資料表結構 `movie`
 --
 
