@@ -1,5 +1,12 @@
 <?php
+session_start();
 require_once "../config/db_conn.php";
+
+// 檢查是否登入
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
+    header('Location: ../LoginView/login.html?error=login_required');
+    exit();
+}
 
 // 1. 檢查必要參數
 if (
@@ -11,7 +18,7 @@ if (
 }
 
 $screening_id = intval($_POST['screening_id']);
-$customer = trim($_POST['customer']);
+$customer = $_SESSION['username'];
 $seat = trim($_POST['seat']);
 
 // 2. 檢查場次是否存在 & 剩餘座位
