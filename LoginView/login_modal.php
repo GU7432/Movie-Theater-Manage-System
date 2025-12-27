@@ -34,7 +34,7 @@
                 </form>
 
                 <div class="text-center mt-3">
-                    <p class="mb-0">還沒有帳號？ <a href="LoginView/register.php">立即註冊</a></p>
+                    <p class="mb-0">還沒有帳號？ <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal">立即註冊</a></p>
                 </div>
             </div>
         </div>

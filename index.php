@@ -5,7 +5,8 @@ require_once "config/db_conn.php";
 // 获取 flash 消息
 $flash_error = $_SESSION['flash_error'] ?? '';
 $flash_success = $_SESSION['flash_success'] ?? '';
-unset($_SESSION['flash_error'], $_SESSION['flash_success']);
+$flash_register_error = $_SESSION['flash_register_error'] ?? '';
+unset($_SESSION['flash_error'], $_SESSION['flash_success'], $_SESSION['flash_register_error']);
 
 // 查詢所有電影
 $sql = "SELECT * FROM movie ORDER BY MovieID ASC";
@@ -77,6 +78,7 @@ $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <?php include 'LoginView/login_modal.php'; ?>
+    <?php include 'LoginView/register_modal.php'; ?>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
