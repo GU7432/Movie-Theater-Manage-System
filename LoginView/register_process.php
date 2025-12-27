@@ -51,7 +51,7 @@ try {
     
     if ($insertStmt->execute()) {
         // 註冊成功
-        header('Location: login.html?success=registered');
+        header('Location: login.php?success=registered');
         exit();
     } else {
         // 註冊失敗

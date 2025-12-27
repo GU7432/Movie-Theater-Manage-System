@@ -1,3 +1,21 @@
+<?php
+session_start();
+
+/**
+ * Flash message（一次性訊息）
+ * login_process.php / register_process.php 只要設定：
+ *   $_SESSION['flash_success'] = '...';
+ *   $_SESSION['flash_error'] = '...';
+ * 然後 redirect 到 login.php
+ */
+
+$flash_error = $_SESSION['flash_error'] ?? '';
+$flash_success = $_SESSION['flash_success'] ?? '';
+$flash_info = $_SESSION['flash_info'] ?? '';
+
+// 顯示一次就清掉（避免常駐）
+unset($_SESSION['flash_error'], $_SESSION['flash_success'], $_SESSION['flash_info']);
+?>
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -11,45 +29,40 @@
         <div class="login-box">
             <h1>🎬 電影院管理系統</h1>
             <h2>會員登入</h2>
-            
+
+            <!-- ✅ Flash messages -->
+            <?php if (!empty($flash_error)): ?>
+                <div class="error-message">
+                    <?= htmlspecialchars($flash_error) ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($flash_success)): ?>
+                <div class="success-message">
+                    <?= htmlspecialchars($flash_success) ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($flash_info)): ?>
+                <div class="info-message">
+                    <?= htmlspecialchars($flash_info) ?>
+                </div>
+            <?php endif; ?>
+
             <form action="login_process.php" method="POST">
                 <div class="input-group">
                     <label for="username">使用者名稱</label>
                     <input type="text" id="username" name="username" required placeholder="請輸入使用者名稱">
                 </div>
-                
+
                 <div class="input-group">
                     <label for="password">密碼</label>
                     <input type="password" id="password" name="password" required placeholder="請輸入密碼">
                 </div>
-                
+
                 <button type="submit" class="btn-login">登入</button>
             </form>
-            
-            <?php if(isset($_GET['error'])): ?>
-                <div class="error-message">
-                    <?php
-                        if($_GET['error'] == 'invalid') {
-                            echo '❌ 帳號或密碼錯誤！';
-                        } elseif($_GET['error'] == 'empty') {
-                            echo '❌ 請填寫所有欄位！';
-                        }
-                    ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if(isset($_GET['success']) && $_GET['success'] == 'registered'): ?>
-                <div class="success-message">
-                    ✅ 註冊成功！請登入
-                </div>
-            <?php endif; ?>
-            
-            <?php if(isset($_GET['logout'])): ?>
-                <div class="success-message">
-                    ✅ 已成功登出
-                </div>
-            <?php endif; ?>
-            
+
             <div class="register-link">
                 <p>還沒有帳號？ <a href="register.html">立即註冊</a></p>
             </div>

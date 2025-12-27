@@ -31,5 +31,5 @@ echo "<p style='color: red;'>1. 此腳本已被鎖定，無法再次執行</p>";
 echo "<p style='color: red;'>2. 請立即登入並修改預設密碼</p>";
 echo "<p style='color: red;'>3. 如果是正式環境，請刪除此檔案：setup.php</p>";
 echo "<br>";
-echo "<a href='LoginView/login.html'>前往登入頁面</a>";
+echo "<a href='LoginView/login.php'>前往登入頁面</a>";
 ?>
