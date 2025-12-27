@@ -42,7 +42,7 @@ try {
         if ($user['IsAdmin']) {
             header('Location: ../public/admin_dashboard.php');
         } else {
-            header('Location: ../public/movie_list.php');
+            header('Location: ../index.php');
         }
         exit();
     } else {
