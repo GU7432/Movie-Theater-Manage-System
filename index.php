@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once "config/db_conn.php";
 
 // 查詢所有電影
@@ -26,7 +27,14 @@ $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- 導航按鈕 -->
         <div class="mb-4 d-flex justify-content-between">
             <a href="index.php" class="btn btn-secondary">Home</a>
-            <a href="LoginView/login_process.php" class="btn btn-warning">登入</a>
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+                <div>
+                    <span class="me-3">歡迎，<?= htmlspecialchars($_SESSION['username']) ?></span>
+                    <a href="LoginView/logout.php" class="btn btn-warning">登出</a>
+                </div>
+            <?php else: ?>
+                <a href="LoginView/login.php" class="btn btn-warning">登入</a>
+            <?php endif; ?>
         </div>
 
         <h2 class="mb-4">現正上映電影</h2>
