@@ -37,7 +37,7 @@
 
     <a href="public/movie_list.php" class="btn">電影列表 / 訂票</a>
     <a href="public/booking.php" class="btn">訂票頁面</a>
-    <a href="LoginView/login_process.php" class="btn">管理者登入</a>
+    <a href="LoginView/login.html" class="btn">管理者登入</a>
 
 </body>
 </html>
