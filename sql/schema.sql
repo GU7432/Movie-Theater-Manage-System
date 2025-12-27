@@ -30,9 +30,10 @@ USE `final_project`;
 
 CREATE TABLE `users` (
   `UserName` varchar(255) NOT NULL COMMENT '使用者名稱',
-  `password_hash` VARCHAR(255) NOT NULL COMMENT `密碼hash`,
-  `IsAdmin` boolean NOT NULL COMMENT `是否為admin`
+  `password_hash` varchar(255) NOT NULL COMMENT '密碼hash',
+  `IsAdmin` boolean NOT NULL COMMENT '是否為admin'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 
 -- --------------------------------------------------------
@@ -98,7 +99,7 @@ CREATE TABLE `ticket` (
 -- 傾印資料表的資料 `ticket`
 --
 
-INSERT INTO `ticket` (`TicketID`, `ScreeningID`, `CustomerName`, `SeatNumber`, `PurchaseTime`) VALUES
+INSERT INTO `ticket` (`TicketID`, `ScreeningID`, `UserName`, `SeatNumber`, `PurchaseTime`) VALUES
 (1, 1, '楊小熹', 'G09', '2025-12-06 11:47:49'),
 (2, 17, '小管管', 'Y09', '2025-11-13 18:48:31');
 
