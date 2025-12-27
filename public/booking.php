@@ -249,7 +249,8 @@ $(document).ready(function(){
     });
 });
 </script>
-
+<?php include '../LoginView/login_modal.php'; ?>
+<?php include '../LoginView/register_modal.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
