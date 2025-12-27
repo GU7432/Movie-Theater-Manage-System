@@ -144,8 +144,6 @@ ALTER TABLE `screening`
 --
 ALTER TABLE `screening`
   ADD CONSTRAINT `screening_ibfk_1` FOREIGN KEY (`MovieID`) REFERENCES `movie` (`MovieID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
 -- 資料表的限制式 `ticket`
 --
 ALTER TABLE `ticket`
