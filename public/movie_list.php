@@ -16,7 +16,6 @@ $movies = $stmt->fetchAll();
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -25,6 +24,14 @@ $movies = $stmt->fetchAll();
 <body class="p-4">
 
 <div class="container">
+
+    <!-- 導航按鈕 -->
+    <div class="mb-4 d-flex justify-content-between">
+        <a href="../index.php" class="btn btn-secondary">Home</a>
+        <div>
+            <a href="admin_login.php" class="btn btn-warning">Admin 登入</a>
+        </div>
+    </div>
 
     <h2 class="mb-4">現正上映電影</h2>
 
@@ -46,8 +53,11 @@ $movies = $stmt->fetchAll();
 
                         <div class="mt-auto">
                             <a href="screening_list.php?movie_id=<?= $movie['MovieID'] ?>"
-                               class="btn btn-primary w-100">
+                               class="btn btn-primary w-100 mb-2">
                                 查看場次
+                            </a>
+                            <a href="../index.php" class="btn btn-outline-secondary w-100">
+                                回到首頁
                             </a>
                         </div>
                     </div>
