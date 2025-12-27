@@ -180,13 +180,14 @@ $taken_seats = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 <script>
 $(document).ready(function(){
-    $(".seat").not(".taken").click(function(){
-        $(".seat").removeClass("selected");
+    $("#seats .seat").not(".taken").click(function(){
+        $("#seats .seat").removeClass("selected");   // 只清座位表，不動圖例
         $(this).addClass("selected");
         $("#seatInput").val($(this).data("seat"));
     });
 });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
