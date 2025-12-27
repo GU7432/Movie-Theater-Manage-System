@@ -30,7 +30,7 @@ if ($screening['AvailableSeats'] <= 0) {
 
 // 3. 新增訂票（ticket）
 $sql_insert = "
-    INSERT INTO ticket (ScreeningID, CustomerName, SeatNumber, PurchaseTime)
+    INSERT INTO ticket (ScreeningID, UserName, SeatNumber, PurchaseTime)
     VALUES (?, ?, ?, NOW())
 ";
 $stmt2 = $db->prepare($sql_insert);
