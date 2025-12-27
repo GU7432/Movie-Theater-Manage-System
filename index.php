@@ -1,43 +1,75 @@
 <?php
-// index.php - 主畫面
+require_once "config/db_conn.php";
+
+// 查詢所有電影
+$sql = "SELECT * FROM movie ORDER BY MovieID ASC";
+$stmt = $db->prepare($sql);
+$stmt->execute();
+$movies = $stmt->fetchAll();
 ?>
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>Cinema 主畫面</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
-            text-align: center;
-            padding: 50px;
-        }
-        h1 {
-            color: #333;
-        }
-        .btn {
-            display: inline-block;
-            margin: 20px;
-            padding: 15px 30px;
-            font-size: 18px;
-            text-decoration: none;
-            color: #fff;
-            background-color: #007bff;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-    <h1>歡迎來到 Cinema 電影院網站</h1>
+    <title>電影列表</title>
 
-    <a href="public/movie_list.php" class="btn">電影列表 / 訂票</a>
-    <a href="public/booking.php" class="btn">訂票頁面</a>
-    <a href="LoginView/login.html" class="btn">管理者登入</a>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body class="p-4">
+
+<div class="container">
+
+    <!-- 導航按鈕 -->
+    <div class="mb-4 d-flex justify-content-between">
+        <a href="index.php" class="btn btn-secondary">Home</a>
+        <div>
+            <a href="LoginView/login_process.php" class="btn btn-warning">登入</a>
+        </div>
+    </div>
+
+    <h2 class="mb-4">現正上映電影</h2>
+
+    <div class="row">
+
+        <?php foreach ($movies as $movie) { ?>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+
+                    <?php if(!empty($movie['Image'])): ?>
+                        <img src="resource/<?= htmlspecialchars($movie['Image']) ?>"
+                             class="card-img-top" alt="<?= htmlspecialchars($movie['Title']) ?>">
+                    <?php endif; ?>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">
+                            <?= htmlspecialchars($movie['Title']) ?>
+                        </h5>
+
+                        <p class="card-text">
+                            類型：<?= htmlspecialchars($movie['Genre']) ?><br>
+                            片長：<?= $movie['Duration'] ?> 分鐘
+                        </p>
+
+                        <div class="mt-auto">
+                            <a href="public/screening_list.php?movie_id=<?= $movie['MovieID'] ?>"
+                               class="btn btn-primary w-100 mb-2">
+                                查看場次
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        <?php } ?>
+
+    </div>
+
+</div>
 
 </body>
 </html>
