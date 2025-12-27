@@ -1,38 +1,35 @@
 <?php
-// === 只允許在命令列執行 ===
+require_once 'config/db_conn.php';
 
 
-require_once '../config/db_conn.php';
+echo "<h1>🎬 系統初始化</h1>";
 
-// 互動式設定管理員密碼
-echo "請設定管理員密碼：";
-$password = trim(fgets(STDIN));
+// ... 初始化代碼 ...
 
-if (strlen($password) < 6) {
-    die("❌ 密碼長度至少要 6 個字元\n");
-}
+$accounts = [
+    ['username' => 'admin', 'password' => 'admin123', 'isAdmin' => 1],
+];
 
-echo "請再次確認密碼：";
-$confirm = trim(fgets(STDIN));
-
-if ($password !== $confirm) {
-    die("❌ 兩次密碼不一致\n");
-}
-
-// 建立管理員帳號
-$hash = password_hash($password, PASSWORD_DEFAULT);
-
-try {
-    $stmt = $db->prepare("INSERT INTO users (UserName, password_hash, IsAdmin) VALUES (?, ?, ?)");
-    $stmt->execute(['admin', $hash, 1]);
+foreach ($accounts as $account) {
+    $hash = password_hash($account['password'], PASSWORD_DEFAULT);
     
-    echo "\n✅ 管理員帳號建立成功！\n";
-    echo "帳號：admin\n";
-    echo "密碼：（你剛才設定的）\n\n";
-    echo "啟動伺服器：php -S localhost:8000\n";
-    echo "登入網址：http://localhost:8000/LoginView/login.html\n";
-    
-} catch (PDOException $e) {
-    echo "❌ 錯誤：" . $e->getMessage() . "\n";
+    try {
+        $stmt = $db->prepare("INSERT INTO users (UserName, password_hash, IsAdmin) VALUES (?, ?, ?)");
+        $stmt->execute([$account['username'], $hash, $account['isAdmin']]);
+        
+        echo "✅ 管理員帳號已建立<br>";
+        echo "⚠️ <strong>請立即登入並修改密碼！</strong><br>";
+    } catch (PDOException $e) {
+        // 靜默處理（避免洩露錯誤訊息）
+    }
 }
+
+
+echo "<hr>";
+echo "<h2>⚠️ 安全提示：</h2>";
+echo "<p style='color: red;'>1. 此腳本已被鎖定，無法再次執行</p>";
+echo "<p style='color: red;'>2. 請立即登入並修改預設密碼</p>";
+echo "<p style='color: red;'>3. 如果是正式環境，請刪除此檔案：setup.php</p>";
+echo "<br>";
+echo "<a href='LoginView/login.html'>前往登入頁面</a>";
 ?>
