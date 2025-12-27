@@ -22,11 +22,6 @@ CREATE TABLE `users` (
   PRIMARY KEY (`UserName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 範例資料
-INSERT INTO `users` (`UserName`, `password_hash`, `IsAdmin`) VALUES
-('admin', SHA2('admin123',256), TRUE),
-('user1', SHA2('user123',256), FALSE);
-
 -- --------------------------------------------------------
 -- 建立 movie
 -- --------------------------------------------------------
