@@ -34,6 +34,13 @@ $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="container">
 
+        <?php if (!empty($flash_success)): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle"></i> <?= htmlspecialchars($flash_success) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
         <h2 class="mb-4">現正上映電影</h2>
 
         <div class="row">

@@ -48,9 +48,9 @@ $path_prefix_modal = $in_public_modal ? '../' : '';
     </div>
 </div>
 
-<?php if (!empty($flash_error) || !empty($flash_success)): ?>
+<?php if (!empty($flash_error)): ?>
 <script>
-    // 如果有錯誤或成功消息，自動打開模態框
+    // 只有登入錯誤時才自動打開模態框
     document.addEventListener('DOMContentLoaded', function() {
         var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
         loginModal.show();
