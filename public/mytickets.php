@@ -3,11 +3,11 @@ session_start();
 require_once "../config/db_conn.php";
 
 // 假設使用者登入後，會把 UserName 存在 session
-if (!isset($_SESSION['UserName'])) {
+if (!isset($_SESSION['logged_in'])) {
     die("請先登入才能查看訂票紀錄。<br><a href='../index.php'>回首頁</a>");
 }
 
-$username = $_SESSION['UserName'];
+$username = $_SESSION['username'];
 
 // 查詢使用者訂票紀錄
 $sql = "SELECT t.TicketID, t.SeatNumber, t.PurchaseTime, s.StartTime, s.Hall, s.Price, m.Title
