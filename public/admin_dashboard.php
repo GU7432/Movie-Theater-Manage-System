@@ -14,9 +14,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $title = trim($_POST['title']);
                 $genre = trim($_POST['genre']);
                 $duration = intval($_POST['duration']);
+                $img = 'resource/default.svg'; // 默认图片
                 
-                $stmt = $db->prepare("INSERT INTO movie (Title, Genre, Duration) VALUES (?, ?, ?)");
-                $stmt->execute([$title, $genre, $duration]);
+                // 处理图片上传
+                if (isset($_FILES['movie_img']) && $_FILES['movie_img']['error'] == 0) {
+                    $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+                    $filename = $_FILES['movie_img']['name'];
+                    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                    
+                    if (in_array($ext, $allowed)) {
+                        $newname = 'movie_' . time() . '.' . $ext;
+                        $upload_path = '../resource/' . $newname;
+                        if (move_uploaded_file($_FILES['movie_img']['tmp_name'], $upload_path)) {
+                            $img = 'resource/' . $newname;
+                        }
+                    }
+                }
+                
+                $stmt = $db->prepare("INSERT INTO movie (Title, Genre, Duration, img) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$title, $genre, $duration, $img]);
                 echo json_encode(['success' => true, 'message' => '電影新增成功']);
                 break;
                 
@@ -26,8 +42,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $genre = trim($_POST['genre']);
                 $duration = intval($_POST['duration']);
                 
-                $stmt = $db->prepare("UPDATE movie SET Title=?, Genre=?, Duration=? WHERE MovieID=?");
-                $stmt->execute([$title, $genre, $duration, $id]);
+                // 获取现有图片路径
+                $stmt = $db->prepare("SELECT img FROM movie WHERE MovieID=?");
+                $stmt->execute([$id]);
+                $img = $stmt->fetchColumn();
+                
+                // 处理图片上传
+                if (isset($_FILES['movie_img']) && $_FILES['movie_img']['error'] == 0) {
+                    $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+                    $filename = $_FILES['movie_img']['name'];
+                    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                    
+                    if (in_array($ext, $allowed)) {
+                        $newname = 'movie_' . time() . '.' . $ext;
+                        $upload_path = '../resource/' . $newname;
+                        if (move_uploaded_file($_FILES['movie_img']['tmp_name'], $upload_path)) {
+                            // 删除旧图片（如果不是默认图片）
+                            if ($img && $img != 'resource/default.svg' && file_exists('../' . $img)) {
+                                unlink('../' . $img);
+                            }
+                            $img = 'resource/' . $newname;
+                        }
+                    }
+                }
+                
+                $stmt = $db->prepare("UPDATE movie SET Title=?, Genre=?, Duration=?, img=? WHERE MovieID=?");
+                $stmt->execute([$title, $genre, $duration, $img, $id]);
                 echo json_encode(['success' => true, 'message' => '電影修改成功']);
                 break;
                 
@@ -274,6 +314,7 @@ $stats = [
                                 <thead class="table-dark">
                                     <tr>
                                         <th>ID</th>
+                                        <th>圖片</th>
                                         <th>電影名稱</th>
                                         <th>類型</th>
                                         <th>片長</th>
@@ -284,6 +325,12 @@ $stats = [
                                     <?php foreach ($movies as $m): ?>
                                     <tr>
                                         <td><?= $m['MovieID'] ?></td>
+                                        <td>
+                                            <img src="../<?= htmlspecialchars($m['img'] ?? 'resource/default.svg') ?>" 
+                                                 alt="<?= htmlspecialchars($m['Title']) ?>" 
+                                                 style="width: 60px; height: 90px; object-fit: cover; border-radius: 5px;"
+                                                 onerror="this.src='../resource/default.svg'">
+                                        </td>
                                         <td><?= htmlspecialchars($m['Title']) ?></td>
                                         <td><?= htmlspecialchars($m['Genre'] ?? '-') ?></td>
                                         <td><?= $m['Duration'] ?? '-' ?> 分鐘</td>
@@ -371,10 +418,11 @@ $stats = [
                 <h5 class="modal-title" id="movieModalTitle">新增電影</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="movieForm">
+            <form id="movieForm" enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" id="movie_id" name="movie_id">
                     <input type="hidden" id="movie_action" name="action" value="add_movie">
+                    <input type="hidden" id="current_img" name="current_img">
                     
                     <div class="mb-3">
                         <label class="form-label">電影名稱 *</label>
@@ -387,6 +435,14 @@ $stats = [
                     <div class="mb-3">
                         <label class="form-label">片長 (分鐘)</label>
                         <input type="number" class="form-control" id="movie_duration" name="duration" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">電影圖片</label>
+                        <input type="file" class="form-control" id="movie_img" name="movie_img" accept="image/*" onchange="previewImage(this)">
+                        <small class="text-muted">支援格式: JPG, JPEG, PNG, GIF</small>
+                        <div class="mt-2" id="img_preview_container" style="display: none;">
+                            <img id="img_preview" src="" alt="預覽" style="max-width: 200px; max-height: 300px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -509,12 +565,26 @@ $stats = [
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// ========== 图片预览 ==========
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('img_preview').src = e.target.result;
+            document.getElementById('img_preview_container').style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 // ========== 電影管理 ==========
 function openAddMovieModal() {
     document.getElementById('movieModalTitle').textContent = '新增電影';
     document.getElementById('movie_action').value = 'add_movie';
     document.getElementById('movieForm').reset();
     document.getElementById('movie_id').value = '';
+    document.getElementById('current_img').value = '';
+    document.getElementById('img_preview_container').style.display = 'none';
 }
 
 function editMovie(id) {
@@ -533,6 +603,16 @@ function editMovie(id) {
             document.getElementById('movie_title').value = m.Title;
             document.getElementById('movie_genre').value = m.Genre || '';
             document.getElementById('movie_duration').value = m.Duration || '';
+            document.getElementById('current_img').value = m.img || '';
+            
+            // 显示现有图片预览
+            if (m.img) {
+                document.getElementById('img_preview').src = '../' + m.img;
+                document.getElementById('img_preview_container').style.display = 'block';
+            } else {
+                document.getElementById('img_preview_container').style.display = 'none';
+            }
+            
             new bootstrap.Modal(document.getElementById('movieModal')).show();
         }
     });
@@ -558,7 +638,7 @@ document.getElementById('movieForm').addEventListener('submit', function(e) {
     const formData = new FormData(this);
     fetch('admin_dashboard.php', {
         method: 'POST',
-        body: new URLSearchParams(formData)
+        body: formData
     })
     .then(res => res.json())
     .then(data => {
