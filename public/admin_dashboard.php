@@ -209,7 +209,7 @@ $stats = [
 </head>
 <body class="bg-light">
 
-<?php $isAdmin = true; include '../LoginView/navbar.php'; ?>
+<?php include '../LoginView/navbar.php'; ?>
 
 <div class="container-fluid">
     <div class="row">

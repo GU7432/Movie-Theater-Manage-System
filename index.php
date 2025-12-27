@@ -30,7 +30,7 @@ $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body class="bg-light">
 
-    <?php $isAdmin = false; include 'LoginView/navbar.php'; ?>
+    <?php include 'LoginView/navbar.php'; ?>
 
     <div class="container">
 
