@@ -1,8 +1,6 @@
 <?php
 // === 只允許在命令列執行 ===
-if (php_sapi_name() !== 'cli') {
-    die("此腳本只能在命令列執行！\n");
-}
+
 
 require_once '../config/db_conn.php';
 
