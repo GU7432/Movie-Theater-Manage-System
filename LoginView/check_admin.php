@@ -6,13 +6,13 @@ session_start();
 
 // 檢查是否已登入
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header('Location: ../LoginView/login.html');
+    header('Location: ../LoginView/login.php');
     exit();
 }
 
 // 檢查是否為管理員
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
-    header('Location: ../public/movie_list.php?error=no_permission');
+    header('Location: ../index.php?error=no_permission');
     exit();
 }
 

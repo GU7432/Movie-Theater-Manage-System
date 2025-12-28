@@ -2,77 +2,51 @@
 session_start();
 require_once "../config/db_conn.php";
 
-// 檢查是否登入
-if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
-    header('Location: ../LoginView/login.html?error=login_required');
+// 只允許 POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: login.php');
     exit();
 }
 
-// 1. 檢查必要參數
-if (
-    !isset($_POST['screening_id']) ||
-    !isset($_POST['seat'])
-) {
+$screening_id = intval($_POST['screening_id'] ?? 0);
+$customer = $_SESSION['username'] ?? null;
+$seat = trim($_POST['seat'] ?? '');
+
+if (!$customer || !$seat || $screening_id <= 0) {
     die("資料不完整");
 }
 
-$screening_id = intval($_POST['screening_id']);
-$customer = $_SESSION['username'];
-$seat = trim($_POST['seat']);
+try {
+    // 開始交易
+    $db->beginTransaction();
 
-// 2. 檢查場次是否存在 & 剩餘座位
-$sql_check = "SELECT AvailableSeats FROM screening WHERE ScreeningID = ?";
-$stmt = $db->prepare($sql_check);
-$stmt->execute([$screening_id]);
-$screening = $stmt->fetch();
+    // 1. 檢查座位是否已被訂
+    $stmt = $db->prepare(
+        "SELECT COUNT(*) FROM ticket
+         WHERE ScreeningID = ? AND SeatNumber = ?"
+    );
+    $stmt->execute([$screening_id, $seat]);
 
-if (!$screening) {
-    die("找不到該場次");
+    if ($stmt->fetchColumn() > 0) {
+        throw new Exception("該座位已被訂過");
+    }
+
+    // 2. 插入訂票（Trigger 會處理剩餘座位）
+    $stmt = $db->prepare(
+        "INSERT INTO ticket (ScreeningID, UserName, SeatNumber, PurchaseTime)
+         VALUES (?, ?, ?, NOW())"
+    );
+    $stmt->execute([$screening_id, $customer, $seat]);
+
+    // 成功
+    $db->commit();
+
+    $_SESSION['flash_success'] = '訂票成功！座位：' . htmlspecialchars($seat);
+    header('Location: ../index.php');
+    exit();
+
+} catch (Exception $e) {
+    $db->rollBack();
+    die("訂票失敗：" . $e->getMessage());
 }
-
-if ($screening['AvailableSeats'] <= 0) {
-    die("該場次已無剩餘座位");
-}
-
-// 3. 新增訂票（ticket）
-$sql_insert = "
-    INSERT INTO ticket (ScreeningID, UserName, SeatNumber, PurchaseTime)
-    VALUES (?, ?, ?, NOW())
-";
-$stmt2 = $db->prepare($sql_insert);
-$stmt2->execute([$screening_id, $customer, $seat]);
-
-// 4. 更新剩餘座位
-$sql_update = "
-    UPDATE screening
-    SET AvailableSeats = AvailableSeats - 1
-    WHERE ScreeningID = ?
-";
-$stmt3 = $db->prepare($sql_update);
-$stmt3->execute([$screening_id]);
-
 ?>
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <title>訂票完成</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body class="p-4">
-<div class="container">
-
-    <div class="alert alert-success">
-        <h4 class="alert-heading">訂票成功！</h4>
-        <p>顧客姓名：<?= htmlspecialchars($customer) ?></p>
-        <p>座位號碼：<?= htmlspecialchars($seat) ?></p>
-    </div>
-
-    <a href="movie_list.php" class="btn btn-primary">回到電影列表</a>
-
-</div>
-</body>
-</html>
