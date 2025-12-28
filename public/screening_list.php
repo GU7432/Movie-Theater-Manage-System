@@ -19,7 +19,16 @@
     }
 
     // 查詢該電影所有場次
-    $sql_screenings = "SELECT * FROM screening WHERE MovieID = ? ORDER BY StartTime ASC";
+    $sql_screenings = "
+    SELECT 
+        s.*,
+        endTime(s.StartTime, m.Duration) AS EndTime
+    FROM screening s
+    JOIN movie m ON s.MovieID = m.MovieID
+    WHERE s.MovieID = ?
+    ORDER BY s.StartTime ASC
+";
+
     $stmt2 = $db->prepare($sql_screenings);
     $stmt2->execute([$movie_id]);
     $screenings = $stmt2->fetchAll();  // 多筆
@@ -57,6 +66,7 @@
                     <tr>
                         <th><i class="bi bi-hash"></i> 場次ID</th>
                         <th><i class="bi bi-clock"></i> 開始時間</th>
+                        <th><i class="bi bi-clock-history"></i> 結束時間</th>
                         <th><i class="bi bi-door-open"></i> 場次廳別</th>
                         <th><i class="bi bi-cash"></i> 票價</th>
                         <th><i class="bi bi-people"></i> 剩餘座位</th>
@@ -68,6 +78,7 @@
                     <tr>
                         <td><?= $row['ScreeningID'] ?></td>
                         <td><?= $row['StartTime'] ?></td>
+                        <td><?= $row['EndTime'] ?></td>
                         <td><?= htmlspecialchars($row['Hall']) ?></td>
                         <td><strong>$<?= $row['Price'] ?></strong></td>
                         <td>
