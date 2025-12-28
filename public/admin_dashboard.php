@@ -14,9 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $title = trim($_POST['title']);
                 $genre = trim($_POST['genre']);
                 $duration = intval($_POST['duration']);
-                $img = 'resource/default.svg'; // 默认图片
+                $img = 'resource/default.svg'; // 預設圖片
                 
-                // 处理图片上传
+                // 處理圖片上傳
                 if (isset($_FILES['movie_img']) && $_FILES['movie_img']['error'] == 0) {
                     $allowed = ['jpg', 'jpeg', 'png', 'gif'];
                     $filename = $_FILES['movie_img']['name'];
@@ -42,12 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $genre = trim($_POST['genre']);
                 $duration = intval($_POST['duration']);
                 
-                // 获取现有图片路径
+                // 取得現有圖片路徑
                 $stmt = $db->prepare("SELECT img FROM movie WHERE MovieID=?");
                 $stmt->execute([$id]);
                 $img = $stmt->fetchColumn();
                 
-                // 处理图片上传
+                // 處理圖片上傳
                 if (isset($_FILES['movie_img']) && $_FILES['movie_img']['error'] == 0) {
                     $allowed = ['jpg', 'jpeg', 'png', 'gif'];
                     $filename = $_FILES['movie_img']['name'];
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $newname = 'movie_' . time() . '.' . $ext;
                         $upload_path = '../resource/' . $newname;
                         if (move_uploaded_file($_FILES['movie_img']['tmp_name'], $upload_path)) {
-                            // 删除旧图片（如果不是默认图片）
+                            // 刪除舊圖片（如果不是預設圖片）
                             if ($img && $img != 'resource/default.svg' && file_exists('../' . $img)) {
                                 unlink('../' . $img);
                             }
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $hall = trim($_POST['hall']);
                 $start_time = $_POST['start_time'];
                 $price = floatval($_POST['price']);
-                $seats = 100; // 固定座位数为100
+                $seats = 100; // 固定座位數為100
                 
                 $stmt = $db->prepare("INSERT INTO screening (MovieID, Hall, StartTime, Price, AvailableSeats) VALUES (?, ?, ?, ?, ?)");
                 $stmt->execute([$movie_id, $hall, $start_time, $price, $seats]);
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $hall = trim($_POST['hall']);
                 $start_time = $_POST['start_time'];
                 $price = floatval($_POST['price']);
-                $seats = 100; // 固定座位数为100
+                $seats = 100; // 固定座位數為100
                 
                 $stmt = $db->prepare("UPDATE screening SET MovieID=?, Hall=?, StartTime=?, Price=?, AvailableSeats=? WHERE ScreeningID=?");
                 $stmt->execute([$movie_id, $hall, $start_time, $price, $seats, $id]);
@@ -549,7 +549,7 @@ $stats = [
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ========== 图片预览 ==========
+// ========== 圖片預覽 ==========
 function previewImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -589,7 +589,7 @@ function editMovie(id) {
             document.getElementById('movie_duration').value = m.Duration || '';
             document.getElementById('current_img').value = m.img || '';
             
-            // 显示现有图片预览
+            // 顯示現有圖片預覽
             if (m.img) {
                 document.getElementById('img_preview').src = '../' + m.img;
                 document.getElementById('img_preview_container').style.display = 'block';

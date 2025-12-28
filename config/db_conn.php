@@ -1,4 +1,5 @@
 <?php
+    // Database connection configuration file
     $user = 'root';
     $password = '123456789';
     try{

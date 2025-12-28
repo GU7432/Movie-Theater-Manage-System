@@ -240,9 +240,9 @@ $taken_seats = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 <script>
 $(document).ready(function(){
-    // 只选择 seats 区域内的座位，排除已被订和标识图
+    // 座位點擊事件
     $("#seats .seat").not(".taken").click(function(){
-        // 只清除 seats 区域内的 selected 状态
+        // 清除所有已選座位
         $("#seats .seat").removeClass("selected");
         $(this).addClass("selected");
         $("#seatInput").val($(this).data("seat"));

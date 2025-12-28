@@ -34,11 +34,6 @@ try {
         $_SESSION['username'] = $user['UserName'];
         $_SESSION['is_admin'] = (bool)$user['IsAdmin'];
         
-        // 更新最後登入時間（如果需要的話）
-        // $updateStmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE UserName = :username");
-        // $updateStmt->bindParam(':username', $username);
-        // $updateStmt->execute();
-        
         // 根據使用者身份跳轉
         if ($user['IsAdmin']) {
             header('Location: ../public/admin_dashboard.php');

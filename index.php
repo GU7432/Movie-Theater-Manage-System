@@ -2,7 +2,7 @@
 session_start();
 require_once "config/db_conn.php";
 
-// 获取 flash 消息
+// 獲取登入註冊 flash 成功或失敗的消息
 $flash_error = $_SESSION['flash_error'] ?? '';
 $flash_success = $_SESSION['flash_success'] ?? '';
 $flash_register_error = $_SESSION['flash_register_error'] ?? '';
